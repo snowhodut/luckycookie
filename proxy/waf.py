@@ -3,22 +3,14 @@
 import time
 import logging
 from flask import request, g
-from datetime import datetime
+from datetime import datetime, timezone
 
 from logger import Logger, LogEntry, Violation, LOG_LEVEL_INFO, LOG_LEVEL_WARNING
 from rule_engine import RuleEngine
 
-# ——— 룰 엔진과 로거 초기화 ———
+# WAF 미들웨어 초기화
 rule_engine = RuleEngine()
-try:
-    rule_engine.load_rules_from_file('rules.json')
-except Exception as e:
-    logging.warning(f"⚠️ 규칙 파일 로드 실패: {e} - 기본 규칙을 사용합니다")
-    rule_engine.add_default_rules()
-
 logger = Logger('waf.log', console_logging=True)
-# 5분마다 규칙 자동 리로드
-rule_engine.start_periodic_reload('rules.json', 300)
 
 def waf_before_request():
     # 요청 시작 시간 저장
@@ -44,7 +36,7 @@ def waf_before_request():
 
     # 로그 엔트리 생성
     entry = LogEntry(
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         level=LOG_LEVEL_WARNING if blocked else LOG_LEVEL_INFO,
         client_ip=request.headers.get('X-Forwarded-For', request.remote_addr),
         method=request.method,

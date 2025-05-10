@@ -1,0 +1,19 @@
+{
+  "rules": [
+    {
+      "id": 1001,
+      "name": "SQL Injection Detection",
+      "description": "SQL 명령어를 포함한 요청을 감지합니다",
+      "type": "sql_injection",
+      "pattern": "(?i)(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|OR|AND)\\s+",
+      "severity": 3
+    },
+    {
+      "id": 2001,
+      "name": "XSS Attack Detection",
+      "description": "자바스크립트 코드를 포함한 요청을 감지합니다",
+      "type": "xss_attack",
+      "pattern": "(?i)(<script|onerror|onload|alert\\()"
+    }
+  ]
+}
